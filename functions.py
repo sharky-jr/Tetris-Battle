@@ -3,6 +3,7 @@ from shape_formats import shape_colors, shapes
 import csv
 import contextlib
 import os
+import ctypes
 with contextlib.redirect_stdout(None):
     import pygame
 
@@ -379,10 +380,12 @@ red = (200, 0, 0)
 green = (0, 200, 0)
 
 game = None
+ctypes.windll.user32.SetProcessDPIAware()
+res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
 pygame.init()
-win = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.HWSURFACE)
+win = pygame.display.set_mode(res, pygame.FULLSCREEN | pygame.HWSURFACE)
 width = pygame.display.get_surface().get_width()
 height = pygame.display.get_surface().get_height()
 clock = pygame.time.Clock()
@@ -400,7 +403,7 @@ scores, top_score = load_scores()
 pygame.display.set_caption(label)
 label_render = title_font.render(label, 1, blue)
 x_title = int(width/2-label_render.get_width()/2)
-y_title = int(label_render.get_height()*1.5)
+y_title = int(label_render.get_height()*1.4)
 tetris_sound = pygame.mixer.Sound(os.path.join('Sounds', 'Tetris.wav'))
 change_sound = pygame.mixer.Sound(os.path.join('Sounds', 'change_piece.wav'))
 for obj in menu:
@@ -520,7 +523,7 @@ def check_lost(positions):
 def get_shape(seed):
     random.seed(seed)
     index = random.randrange(0, len(shapes))
-    return Piece(5, 1, random.choice(shapes)), index
+    return Piece(5, 1, shapes[int(random.uniform(0, 6))]), index
 
 
 def clear_rows(grid, locked):
@@ -549,7 +552,7 @@ def clear_rows(grid, locked):
 def draw_menu(menu_input, button_input, shape_stream, offset):
     win.fill(black)
     for i, stream in enumerate(shape_stream):
-        draw_stream(stream, 200 + i*6*block_size, offset[i], int(offset[i]/block_size))
+        draw_stream(stream, (i-1)*5*block_size, offset[i], int(offset[i]/block_size))
     win.blit(label_render, (x_title, y_title))
     i = 0
     for item, button in zip(menu_input, button_input):
@@ -582,7 +585,7 @@ def create_stream():
 
 def main_menu():
     global run
-    rain = [create_stream() for _ in range(10)]
+    rain = [create_stream() for _ in range(15)]
     offset = [block_size * random.randrange(3, 10) for _ in range(len(rain))]
     while run:
         clock.tick(30)
@@ -646,8 +649,8 @@ def battle():
     global game, scores
     r1 = random.randrange(0, 50)
     r2 = random.randrange(0, 48)
-    game = [GameThread(1, block_size*14, int(height/2 - block_size*10), r1, r2),
-            GameThread(2, width-block_size*24, int(height/2 - block_size*10), r1, r2)]
+    game = [GameThread(1, block_size*10, int(height/2 - block_size*10), r1, r2),
+            GameThread(2, width-block_size*20, int(height/2 - block_size*10), r1, r2)]
     run_game = True
     end = True
     while run_game:
@@ -764,7 +767,7 @@ def ask_name(n, score, battle_mode):
 
 def options():
     selection = 0
-    rain = [create_stream() for _ in range(10)]
+    rain = [create_stream() for _ in range(15)]
     offset = [block_size * random.randrange(3, 10) for _ in range(len(rain))]
     global music, hold
     while True:
