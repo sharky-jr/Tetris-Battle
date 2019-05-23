@@ -265,6 +265,7 @@ class GameThread(object):
         surface.blit(render, (self.sx + block_size/3, self.sy - block_size*2))
 
     def draw_window(self, surface):
+        y_title = int(label_render.get_height()*1.1)
         # surface.fill((0, 0, 0))
         global font
         render = font.render('Tetris', 1, white)
@@ -412,8 +413,7 @@ buttons = []
 scores, top_score = load_scores()
 pygame.display.set_caption(label)
 label_render = title_font.render(label, 1, blue)
-x_title = int(width/2-label_render.get_width()/2)
-y_title = int(label_render.get_height()*1.4)
+
 tetris_sound = pygame.mixer.Sound(os.path.join('Sounds', 'Tetris.wav'))
 change_sound = pygame.mixer.Sound(os.path.join('Sounds', 'change_piece.wav'))
 for obj in menu:
@@ -574,6 +574,8 @@ def draw_menu(menu_input, button_input, shape_stream, offset):
     win.fill(black)
     for i, stream in enumerate(shape_stream):
         draw_stream(stream, (i-1)*5*block_size, offset[i], int(offset[i]/block_size))
+    x_title = int(width/2-label_render.get_width()/2)
+    y_title = int(label_render.get_height()*1.4)
     win.blit(label_render, (x_title, y_title))
     i = 0
     for item, button in zip(menu_input, button_input):
@@ -638,6 +640,8 @@ def main_menu():
 
 def draw_scores(score, title):
     win.fill(blue)
+    x_title = int(width/2-label_render.get_width()/2)
+    y_title = int(label_render.get_height()*1.4)
     win.blit(title, (x_title+25, y_title-25))
     for i, each in enumerate(score):
         win.blit(each, (width/2 - each.get_width()/2, y_title + title.get_height() + i*each.get_height()))
