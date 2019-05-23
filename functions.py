@@ -3,7 +3,6 @@ from shape_formats import shape_colors, shapes
 import csv
 import contextlib
 import os
-import ctypes
 with contextlib.redirect_stdout(None):
     import pygame
 
@@ -55,8 +54,8 @@ class Piece(object):
         self.shape = shape
         self.color = shape_colors[shapes.index(shape)]
         self.rotation = 0
-        
-        
+
+
 class GameThread(object):
     def __init__(self, player, x, y, seed, seed2):
         self.player = player
@@ -380,12 +379,13 @@ red = (200, 0, 0)
 green = (0, 200, 0)
 
 game = None
-ctypes.windll.user32.SetProcessDPIAware()
-res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
 pygame.init()
-win = pygame.display.set_mode(res, pygame.FULLSCREEN | pygame.HWSURFACE)
+# https://stackoverflow.com/questions/42598830/wrong-fullscreen-resolution-with-pygame-on-osx
+infos = pygame.display.Info()
+screen_size = (infos.current_w, infos.current_h)
+win = pygame.display.set_mode(screen_size, pygame.FULLSCREEN | pygame.HWSURFACE)
 width = pygame.display.get_surface().get_width()
 height = pygame.display.get_surface().get_height()
 clock = pygame.time.Clock()
