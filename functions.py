@@ -380,12 +380,22 @@ red = (200, 0, 0)
 green = (0, 200, 0)
 
 game = None
-ctypes.windll.user32.SetProcessDPIAware()
-res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
+try:
+    ctypes.windll.user32.SetProcessDPIAware()
+    res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
+except Exception as e:
+    print(e)
+    infos = pygame.display.Info()
+    res = (infos.current_w, infos.current_h)
+
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.mixer.init()
 pygame.init()
+
 win = pygame.display.set_mode(res, pygame.FULLSCREEN | pygame.HWSURFACE)
+infos = pygame.display.Info()
+screen_size = (infos.current_w, infos.current_h)
+win = pygame.display.set_mode(screen_size, pygame.FULLSCREEN | pygame.HWSURFACE)
 width = pygame.display.get_surface().get_width()
 height = pygame.display.get_surface().get_height()
 clock = pygame.time.Clock()
