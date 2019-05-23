@@ -55,8 +55,8 @@ class Piece(object):
         self.shape = shape
         self.color = shape_colors[shapes.index(shape)]
         self.rotation = 0
-        
-        
+
+
 class GameThread(object):
     def __init__(self, player, x, y, seed, seed2):
         self.player = player
@@ -380,6 +380,11 @@ red = (200, 0, 0)
 green = (0, 200, 0)
 
 game = None
+
+pygame.mixer.pre_init(44100, -16, 2, 2048)
+pygame.mixer.init()
+pygame.init()
+
 try:
     ctypes.windll.user32.SetProcessDPIAware()
     res = (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
@@ -387,10 +392,6 @@ except Exception as e:
     print(e)
     infos = pygame.display.Info()
     res = (infos.current_w, infos.current_h)
-
-pygame.mixer.pre_init(44100, -16, 2, 2048)
-pygame.mixer.init()
-pygame.init()
 
 win = pygame.display.set_mode(res, pygame.FULLSCREEN | pygame.HWSURFACE)
 infos = pygame.display.Info()
