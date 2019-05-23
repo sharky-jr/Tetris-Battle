@@ -393,7 +393,6 @@ except Exception as e:
     infos = pygame.display.Info()
     res = (infos.current_w, infos.current_h)
 
-win = pygame.display.set_mode(res, pygame.FULLSCREEN | pygame.HWSURFACE)
 infos = pygame.display.Info()
 screen_size = (infos.current_w, infos.current_h)
 win = pygame.display.set_mode(screen_size, pygame.FULLSCREEN | pygame.HWSURFACE)
@@ -407,7 +406,7 @@ font = pygame.font.SysFont('comicsansms', block_size+10)
 font2 = pygame.font.SysFont('comicsans', block_size)
 label = 'Tetris Battle'
 menu = ['Single Player', '2 Players', 'HighScores', 'Options', 'Quit']
-options_list = ['Hold: ', 'Music: ', 'Azerty: ', 'Back']
+options_list = ['Hold: ', 'Music: ', 'Azerty: ', 'FullScreen: ', 'Back']
 menu_render = []
 buttons = []
 scores, top_score = load_scores()
@@ -424,6 +423,7 @@ run = True
 music = True
 hold = True
 azerty = False
+fullscreen = True
 play_song()
 
 
@@ -599,7 +599,8 @@ def check_active():
 def create_stream():
     stream = []
     for _ in range(4):
-        temp, _ = get_shape(random.randrange(0, 100))
+        temp = Piece(0, 0, random.choice(shapes))
+        temp.rotation += random.randint(0, 10)
         stream.append(temp)
     return stream
 
@@ -787,10 +788,10 @@ def ask_name(n, score, battle_mode):
 
 
 def options():
+    global music, hold, azerty, win, width, height, block_size, fullscreen
     selection = 0
     rain = [create_stream() for _ in range(15)]
     offset = [block_size * random.randrange(3, 10) for _ in range(len(rain))]
-    global music, hold, azerty
     while True:
         settings_string = generate_string()
         settings_string.append('')
@@ -801,6 +802,8 @@ def options():
             options_buttons.append(Button())
         clock.tick(30)
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
@@ -823,6 +826,15 @@ def options():
                             pygame.mixer_music.stop()
                     elif selection % len(options_render) == 2:
                         azerty = not azerty
+                    elif selection % len(options_render) == 3:
+                        if not fullscreen:
+                            win = pygame.display.set_mode(res, pygame.FULLSCREEN | pygame.HWACCEL)
+                            width, height = res[0], res[1]
+                        else:
+                            win = pygame.display.set_mode((1000, 800))
+                            width, height = 1000, 800
+                        block_size = int(height/36)
+                        fullscreen = not fullscreen
                     else:
                         return True
 
@@ -844,6 +856,10 @@ def generate_string():
         settings.append('On')
     else:
         settings.append('Off')
+    if fullscreen:
+        settings.append('On')
+    else:
+        settings.append('Off')
     return settings
 
 
@@ -856,7 +872,7 @@ def draw_shape(shape, surface, sx, sy):
         for j, column in enumerate(row):
             if column == "0":
                 pygame.draw.rect(surface, shape.color,
-                                 (sx + j * block_size, (sy % height) + (i+1) * block_size, block_size, block_size), 0)
+                                 (sx + j * block_size, (sy % height) + (i+1) * block_size - 100, block_size, block_size), 0)
 
 
 def draw_stream(shape_stream, x, offset, speed):
