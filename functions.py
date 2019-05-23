@@ -141,7 +141,7 @@ class GameThread(object):
                                                                                                    self.next_piece,
                                                                                                    self.seed)
                             self.seed, self.seed2 = shuffle(self.seed, self.seed2, index)
-                    elif event.key == pygame.K_RCTRL:
+                    elif event.key == pygame.K_RALT:
                         self.drop()
             shape_pos = convert_shape_format(self.current_piece)
             for i in range(len(shape_pos)):
@@ -396,7 +396,7 @@ font = pygame.font.SysFont('comicsansms', block_size+10)
 font2 = pygame.font.SysFont('comicsans', block_size)
 label = 'Tetris Battle'
 menu = ['Single Player', '2 Players', 'HighScores', 'Options', 'Quit']
-options_list = ['Hold: ', 'Music: ', 'Back']
+options_list = ['Hold: ', 'Music: ', 'Azerty: ', 'Back']
 menu_render = []
 buttons = []
 scores, top_score = load_scores()
@@ -412,6 +412,7 @@ for obj in menu:
 run = True
 music = True
 hold = True
+azerty = False
 play_song()
 
 
@@ -436,7 +437,7 @@ def players_controls(event):
         game[1].current_piece.x += 1
         if not (valid_space(game[1].current_piece, game[1].grid)):
             game[1].current_piece.x -= 1
-    if event.key == pygame.K_RCTRL:
+    if event.key == pygame.K_RALT:
         game[1].drop()
     if event.key == pygame.K_RSHIFT:
         if game[1].hold_instance.available and hold:
@@ -446,21 +447,30 @@ def players_controls(event):
             game[1].seed, game[1].seed2 = shuffle(game[1].seed, game[1].seed2, index)
 
     # Player 1 controls
-    if event.key == pygame.K_w:
+    if azerty:
+        up = pygame.K_z
+        left = pygame.K_q
+    else:
+        up = pygame.K_w
+        left = pygame.K_a
+    right = pygame.K_d
+    down = pygame.K_s
+
+    if event.key == up:
         game[0].current_piece.rotation += 1
         if not (valid_space(game[0].current_piece, game[0].grid)):
             game[0].current_piece.rotation -= 1
-    if event.key == pygame.K_s:
+    if event.key == down:
         game[0].current_piece.y += 1
         game[0].score += 1
         if not (valid_space(game[0].current_piece, game[0].grid)):
             game[0].current_piece.y -= 1
             game[0].score -= 1
-    if event.key == pygame.K_a:
+    if event.key == left:
         game[0].current_piece.x -= 1
         if not (valid_space(game[0].current_piece, game[0].grid)):
             game[0].current_piece.x += 1
-    if event.key == pygame.K_d:
+    if event.key == right:
         game[0].current_piece.x += 1
         if not (valid_space(game[0].current_piece, game[0].grid)):
             game[0].current_piece.x -= 1
@@ -769,7 +779,7 @@ def options():
     selection = 0
     rain = [create_stream() for _ in range(15)]
     offset = [block_size * random.randrange(3, 10) for _ in range(len(rain))]
-    global music, hold
+    global music, hold, azerty
     while True:
         settings_string = generate_string()
         settings_string.append('')
@@ -800,10 +810,12 @@ def options():
                             play_song()
                         else:
                             pygame.mixer_music.stop()
+                    elif selection % len(options_render) == 2:
+                        azerty = not azerty
                     else:
                         return True
 
-        options_buttons[selection % 3].active = True
+        options_buttons[selection % len(options_buttons)].active = True
         draw_menu(options_render, options_buttons, rain, offset)
 
 
@@ -814,6 +826,10 @@ def generate_string():
     else:
         settings.append('Off')
     if music:
+        settings.append('On')
+    else:
+        settings.append('Off')
+    if azerty:
         settings.append('On')
     else:
         settings.append('Off')
