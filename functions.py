@@ -217,6 +217,7 @@ class GameThread(object):
                 self.current_piece.y -= 1
                 self.score -= 1
                 drop = False
+                self.change_piece = True
 
     def save_score(self, name):
         new_scores = []
